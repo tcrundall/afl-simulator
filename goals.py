@@ -1,5 +1,5 @@
 import pygame
-from pygame import Vector2
+from pygame import Vector2, Surface
 
 from ball import Ball
 
@@ -7,7 +7,7 @@ from ball import Ball
 class Goals:
     post_radius = 5.
 
-    def __init__(self, screen, left_pos: Vector2, right_pos: Vector2):
+    def __init__(self, screen: Surface, left_pos: Vector2, right_pos: Vector2) -> None:
         self.screen = screen
         self.left_pos = left_pos
         self.right_pos = right_pos
@@ -40,7 +40,7 @@ class Goals:
         post_diff = self.right_pos - self.left_pos
         # ball_pos_old = ball.shape.pos - ball.shape.vel * dt
         # ball_trail = - ball.shape.pos + ball_pos_old
-        ball_trail = - ball.shape.vel * 5 * dt
+        ball_trail = -1 * ball.shape.vel * 5 * dt
         ball_pos_ghost = ball.shape.pos + ball_trail
 
         try:

@@ -1,7 +1,11 @@
+from typing import Tuple
 from pygame import Surface, Vector2
 
 from direction import Direction
 from shape import Shape
+
+
+Edge = Tuple[Vector2, Vector2]
 
 
 class Agent():
@@ -19,3 +23,9 @@ class Agent():
 
     def update(self, dt: float) -> None:
         self.shape.update(dt)
+
+    def is_colliding_with(self, edge: Edge, on_side: Vector2) -> bool:
+        return self.shape.is_colliding_with(edge, on_side)
+
+    def snap_to(self, edge: Edge, on_side: Vector2) -> None:
+        self.shape.snap_to(edge, on_side)
