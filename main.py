@@ -2,6 +2,7 @@
 from __future__ import annotations
 import pygame
 from pygame import Vector2
+import time
 
 from src.enums.direction import Direction
 from src.components.player import Player
@@ -12,6 +13,7 @@ from src.components.field import Field
 
 HEIGHT = WIDTH = 500
 FPS = 60
+GAME_DURATION_SEC = 10
 
 
 def main() -> None:
@@ -39,6 +41,7 @@ def main() -> None:
     )
 
     after_goal_frames = None
+    start = time.time()
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -82,6 +85,12 @@ def main() -> None:
         dt = clock.tick(FPS) / 1000
         if after_goal_frames is not None:
             after_goal_frames -= 1
+
+        if time.time() - start >= GAME_DURATION_SEC:
+            running = False
+
+    print("GAME OVER")
+    pygame.quit()
 
 
 if __name__ == "__main__":
