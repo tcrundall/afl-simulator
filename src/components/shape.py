@@ -3,7 +3,7 @@ from typing import Tuple
 import pygame
 from pygame import Surface, Vector2
 
-from .direction import Direction
+from ..enums.direction import Direction
 
 Edge = Tuple[Vector2, Vector2]
 

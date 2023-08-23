@@ -1,7 +1,7 @@
 from typing import Tuple
 from pygame import Surface, Vector2
 
-from .direction import Direction
+from ..enums.direction import Direction
 from .shape import Shape
 from .player import Player
 
