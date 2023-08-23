@@ -4,11 +4,11 @@ from typing import List
 import pygame
 from pygame import Vector2, Surface
 
-from protocols.snappable import Snappable
-from direction import Direction
-from agent import Agent
-from ball import Ball
-from goals import Goals
+from .protocols.snappable import Snappable
+from .direction import Direction
+from .player import Player
+from .ball import Ball
+from .goals import Goals
 
 
 HEIGHT = WIDTH = 500
@@ -34,15 +34,15 @@ class Field:
             (self.corners[3], self.corners[0]),
         ]
 
-    def draw(self):
+    def draw(self) -> None:
         pygame.draw.lines(self.screen, color="white", closed=True, points=self.corners)
 
     def resolve_collisions(self, shapes: List[Snappable]) -> None:
         for shape in shapes:
             self.snap_to_colliding_boundary(shape)
-    
+
     def snap_to_colliding_boundary(self, shape: Snappable) -> None:
-        center = Vector2(self.pos.x + self.width/2, self.pos.y + self.height/2)
+        center = Vector2(self.pos.x + self.width / 2, self.pos.y + self.height / 2)
         corners = [
             Vector2(self.pos.x, self.pos.y),
             Vector2(self.pos.x + self.width, self.pos.y),
@@ -66,22 +66,22 @@ def main() -> None:
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
     running = True
-    dt = 0
-    ball_start = Vector2(screen.get_width()*0.5, screen.get_height()*0.4)
-    agent_start = Vector2(screen.get_width()*0.5, screen.get_height()*0.2)
+    dt = 0.0
+    ball_start = Vector2(screen.get_width() * 0.5, screen.get_height() * 0.4)
+    player_start = Vector2(screen.get_width() * 0.5, screen.get_height() * 0.2)
 
-    agent = Agent(screen, agent_start.copy())
+    player = Player(screen, player_start.copy())
     ball = Ball(screen, ball_start.copy())
     goals = Goals(
         screen,
-        Vector2(screen.get_width()*0.25, screen.get_height()*0.5),
-        Vector2(screen.get_width()*0.75, screen.get_height()*0.5),
+        Vector2(screen.get_width() * 0.25, screen.get_height() * 0.5),
+        Vector2(screen.get_width() * 0.75, screen.get_height() * 0.5),
     )
     field = Field(
         screen,
-        Vector2(screen.get_width()*0.1, screen.get_height()*0.1),
-        width=screen.get_width()*0.8,
-        height=screen.get_height()*0.8,
+        Vector2(screen.get_width() * 0.1, screen.get_height() * 0.1),
+        width=screen.get_width() * 0.8,
+        height=screen.get_height() * 0.8,
     )
 
     after_goal_frames = None
@@ -91,7 +91,7 @@ def main() -> None:
                 running = False
 
         screen.fill("green")
-        agent.draw()
+        player.draw()
         ball.draw()
         goals.draw()
         field.draw()
@@ -99,28 +99,28 @@ def main() -> None:
         # Capture player input
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
-            agent.accelerate(Direction.UP)
+            player.accelerate(Direction.UP)
         if keys[pygame.K_s]:
-            agent.accelerate(Direction.DOWN)
+            player.accelerate(Direction.DOWN)
         if keys[pygame.K_a]:
-            agent.accelerate(Direction.LEFT)
+            player.accelerate(Direction.LEFT)
         if keys[pygame.K_d]:
-            agent.accelerate(Direction.RIGHT)
+            player.accelerate(Direction.RIGHT)
 
         # Handle collisions
-        ball.handle_collision(agent)
-        field.resolve_collisions([agent, ball])
+        ball.handle_collision(player)
+        field.resolve_collisions([player, ball])
 
         if goals.check_goal(ball, dt):
             print("Scored a goal!")
             ball.shape.pos = ball_start.copy()
             ball.shape.vel = Vector2(0, 0)
-            agent.shape.pos = agent_start.copy()
-            agent.shape.vel = Vector2(0, 0)
+            player.shape.pos = player_start.copy()
+            player.shape.vel = Vector2(0, 0)
             after_goal_frames = None
 
         # Update game state
-        agent.update(dt)
+        player.update(dt)
         ball.update(dt)
 
         pygame.display.flip()

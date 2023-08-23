@@ -3,21 +3,21 @@ from typing import Tuple
 import pygame
 from pygame import Surface, Vector2
 
-from direction import Direction
+from .direction import Direction
 
 Edge = Tuple[Vector2, Vector2]
 
-class Shape():
+
+class Shape:
     drag_coefficient = 0.0001
-    acceleration = 10.
+    acceleration = 10.0
 
     def __init__(
-            self, screen: Surface, pos: Vector2, radius: float, color: str
-        ) -> None:
-
+        self, screen: Surface, pos: Vector2, radius: float, color: str
+    ) -> None:
         self.screen = screen
         self.pos = pos
-        self.vel = Vector2(0., 0.)
+        self.vel = Vector2(0.0, 0.0)
         self.radius = radius
         self.color = color
 
@@ -46,29 +46,37 @@ class Shape():
         self.pos += self.vel * dt
         self.add_resistance()
 
-    def add_resistance(self):
+    def add_resistance(self) -> None:
         self.vel -= self.drag_coefficient * self.vel.magnitude() * self.vel
 
-    def overlaps(self, other: Shape):
+    def overlaps(self, other: Shape) -> bool:
         distance_vec = other.pos - self.pos
         return distance_vec.magnitude() < other.radius + self.radius
 
-    def kick(self, other: Shape):
-        mass = self.radius ** 2 * 3.14159
-        mass_other = other.radius ** 2 * 3.14159
+    def kick(self, other: Shape) -> None:
+        mass = self.radius**2 * 3.14159
+        mass_other = other.radius**2 * 3.14159
         vel_diff = self.vel - other.vel
         pos_diff = self.pos - other.pos
 
         # Equations for 2D elasitc collision
         # https://en.wikipedia.org/wiki/Elastic_collision
-        self.vel -=\
-            2 * mass_other / (mass + mass_other)\
-            * vel_diff.dot(pos_diff) / pos_diff.magnitude_squared()\
+        self.vel -= (
+            2
+            * mass_other
+            / (mass + mass_other)
+            * vel_diff.dot(pos_diff)
+            / pos_diff.magnitude_squared()
             * pos_diff
-        other.vel -=\
-            2 * mass / (mass + mass_other)\
-            * -vel_diff.dot(-pos_diff) / pos_diff.magnitude_squared()\
+        )
+        other.vel -= (
+            2
+            * mass
+            / (mass + mass_other)
+            * -vel_diff.dot(-pos_diff)
+            / pos_diff.magnitude_squared()
             * -pos_diff
+        )
 
     def is_colliding_with(self, edge: Edge, on_side: Vector2) -> bool:
         # check vertical:
