@@ -40,7 +40,6 @@ def main() -> None:
         height=screen.get_height() * 0.8,
     )
 
-    after_goal_frames = None
     start = time.time()
     while running:
         for event in pygame.event.get():
@@ -74,7 +73,6 @@ def main() -> None:
             ball.shape.vel = Vector2(0, 0)
             player.shape.pos = player_start.copy()
             player.shape.vel = Vector2(0, 0)
-            after_goal_frames = None
 
         # Update game state
         player.update(dt)
@@ -83,8 +81,6 @@ def main() -> None:
         pygame.display.flip()
 
         dt = clock.tick(FPS) / 1000
-        if after_goal_frames is not None:
-            after_goal_frames -= 1
 
         if time.time() - start >= GAME_DURATION_SEC:
             running = False
