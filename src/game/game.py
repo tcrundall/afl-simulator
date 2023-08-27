@@ -2,6 +2,7 @@ from __future__ import annotations
 import pygame
 from pygame import Vector2
 import time
+from typing import Tuple, List
 
 from src.enums.direction import Direction
 from src.components.player import Player
@@ -26,7 +27,7 @@ class Game:
         self.height = height
         self.width = width
 
-    def new_game(self) -> None:
+    def reset_game(self) -> None:
         pygame.init()
         pygame.display.set_caption("AFL Simulator")
         self.screen = pygame.display.set_mode((self.width, self.height))
@@ -65,7 +66,7 @@ class Game:
         self.player.shape.pos = player_start
         self.player.shape.vel = Vector2(0, 0)
 
-    def play_step(self, dt: float) -> bool:
+    def play_step(self, dt: float, actions: List[Direction]) -> Tuple[bool, int]:
         game_over = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -76,36 +77,46 @@ class Game:
             self.score += 1
             self.place_players_and_ball()
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_w]:
-            self.player.accelerate(Direction.UP)
-        if keys[pygame.K_s]:
-            self.player.accelerate(Direction.DOWN)
-        if keys[pygame.K_a]:
-            self.player.accelerate(Direction.LEFT)
-        if keys[pygame.K_d]:
-            self.player.accelerate(Direction.RIGHT)
+        # Handle player input
+        for direction in actions:
+            self.player.accelerate(direction)
 
+        # Handle collisions
         self.ball.handle_collision(self.player)
         self.field.resolve_collisions([self.player, self.ball])
 
+        # Update positions
         self.player.update(dt)
         self.ball.update(dt)
 
         # Draw
         self.draw()
 
-        return game_over
+        return game_over, self.score
+
+    def parse_keys(self) -> List[Direction]:
+        keys = pygame.key.get_pressed()
+
+        actions = []
+        if keys[pygame.K_w]:
+            actions.append(Direction.UP)
+        if keys[pygame.K_s]:
+            actions.append(Direction.DOWN)
+        if keys[pygame.K_a]:
+            actions.append(Direction.LEFT)
+        if keys[pygame.K_d]:
+            actions.append(Direction.RIGHT)
+
+        return actions
 
     def run(self) -> None:
-        self.place_players_and_ball()
         dt = 0.0
         clock = pygame.time.Clock()
         running = True
         start = time.time()
 
         while running:
-            self.play_step(dt)
+            self.play_step(dt, actions=self.parse_keys())
             dt = clock.tick(self.fps) / 1000
             if time.time() - start >= self.game_duration_sec:
                 running = False
