@@ -11,11 +11,8 @@ from src.components.goals import Goals
 from src.components.field import Field
 
 
-# reset
 # reward
-# play(action) -> Direction
 # game_iteration
-# is_collision
 
 
 class Game:

@@ -1,5 +1,6 @@
 import pygame
 import time
+from typing import Dict, List
 
 from src.game.game import Game
 from src.enums.direction import Direction
@@ -8,26 +9,29 @@ from src.enums.direction import Direction
 class Agent:
     def __init__(self, game: Game) -> None:
         self.game = game
+        self.scores: Dict[str, int] = {}
 
-    def play_game(self) -> None:
+    def play_game(self, agent_id: str) -> None:
         self.game.reset_game()
         dt = 0.0
+        score = 0
         clock = pygame.time.Clock()
         running = True
         start = time.time()
 
         while running:
-            self.game.play_step(dt, actions=self.model())
+            game_over, score = self.game.play_step(dt, actions=self.model())
             dt = clock.tick(self.game.fps) / 1000
-            if time.time() - start >= self.game.game_duration_sec:
+            if game_over or (time.time() - start >= self.game.game_duration_sec):
                 running = False
 
         pygame.quit()
+        self.scores[agent_id] = score
+        print(f"Agent {agent_id} got score {score}")
 
-    def play_game_many_times(self, n_replays: int) -> None:
-        for _ in range(n_replays):
-            self.game.reset_game()
-            # self.game.run()
+    def model(self) -> List[Direction]:
+        return [Direction.DOWN]
 
-    def model(self):
-        return [Direction.LEFT]
+    def play_agent(self, count: int) -> None:
+        for agent_id in range(count):
+            self.play_game(str(agent_id))

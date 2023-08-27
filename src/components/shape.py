@@ -100,7 +100,6 @@ class Shape:
                 return self.pos.y - self.radius <= point1.y
 
     def snap_to(self, edge: Edge, on_side: Vector2) -> None:
-        print(f"Snapping to {edge=}")
         if self.is_vertical(edge):
             self.vel.x *= -1
             dx = abs(abs(edge[0].x - self.pos.x) - self.radius)
