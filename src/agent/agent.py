@@ -1,9 +1,10 @@
 import pygame
 import time
-from typing import Dict, List
+from typing import Dict
+import numpy as np
 
 from src.game.game import Game
-from src.enums.direction import Direction
+from src.types.actionarr import ActionArr
 
 
 class Agent:
@@ -20,7 +21,7 @@ class Agent:
         start = time.time()
 
         while running:
-            game_over, score = self.game.play_step(dt, actions=self.model())
+            _, game_over, score = self.game.play_step(dt, actions=self.model())
             dt = clock.tick(self.game.fps) / 1000
             if game_over or (time.time() - start >= self.game.game_duration_sec):
                 running = False
@@ -29,8 +30,8 @@ class Agent:
         self.scores[agent_id] = score
         print(f"Agent {agent_id} got score {score}")
 
-    def model(self) -> List[Direction]:
-        return [Direction.DOWN]
+    def model(self) -> ActionArr:
+        return np.array([0, 1, 0, 0])
 
     def play_agent(self, count: int) -> None:
         for agent_id in range(count):

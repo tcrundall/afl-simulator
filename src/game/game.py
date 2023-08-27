@@ -1,14 +1,16 @@
 from __future__ import annotations
 import pygame
-from pygame import Vector2
+from pygame import Vector2, font
 import time
-from typing import Tuple, List
+from typing import Tuple
+import numpy as np
 
 from src.enums.direction import Direction
 from src.components.player import Player
 from src.components.ball import Ball
 from src.components.goals import Goals
 from src.components.field import Field
+from src.types.actionarr import ActionArr
 
 
 # reward
@@ -26,6 +28,8 @@ class Game:
 
     def reset_game(self) -> None:
         pygame.init()
+        self.font = font.SysFont("jetbrainsmononerdfontmono.tff", 48)
+
         pygame.display.set_caption("AFL Simulator")
         self.screen = pygame.display.set_mode((self.width, self.height))
 
@@ -63,8 +67,10 @@ class Game:
         self.player.shape.pos = player_start
         self.player.shape.vel = Vector2(0, 0)
 
-    def play_step(self, dt: float, actions: List[Direction]) -> Tuple[bool, int]:
+    def play_step(self, dt: float, actions: ActionArr) -> Tuple[int, bool, int]:
+        reward = 0
         game_over = False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_over = True
@@ -73,10 +79,17 @@ class Game:
         if self.goals.check_goal(self.ball, dt):
             self.score += 1
             self.place_players_and_ball()
+            reward = 10
 
         # Handle player input
-        for direction in actions:
-            self.player.accelerate(direction)
+        actions_list = [
+            Direction.RIGHT,
+            Direction.DOWN,
+            Direction.LEFT,
+            Direction.UP,
+        ]
+        for ix in np.where(actions == 1)[0]:
+            self.player.accelerate(actions_list[ix])
 
         # Handle collisions
         self.ball.handle_collision(self.player)
@@ -89,20 +102,19 @@ class Game:
         # Draw
         self.draw()
 
-        return game_over, self.score
+        return reward, game_over, self.score
 
-    def parse_keys(self) -> List[Direction]:
+    def parse_keys(self) -> ActionArr:
         keys = pygame.key.get_pressed()
+        watched_keys = [
+            pygame.K_d,
+            pygame.K_s,
+            pygame.K_a,
+            pygame.K_w,
+        ]
 
-        actions = []
-        if keys[pygame.K_w]:
-            actions.append(Direction.UP)
-        if keys[pygame.K_s]:
-            actions.append(Direction.DOWN)
-        if keys[pygame.K_a]:
-            actions.append(Direction.LEFT)
-        if keys[pygame.K_d]:
-            actions.append(Direction.RIGHT)
+        actions = np.array([int(keys[key]) for key in watched_keys])
+        print(actions)
 
         return actions
 
@@ -126,6 +138,13 @@ class Game:
         self.ball.draw()
         self.goals.draw()
         self.field.draw()
+
+        WHITE = (255, 255, 255)
+        text = self.font.render(f"Score: {self.score}", True, WHITE)
+        self.screen.blit(
+            text, (0.001 * self.screen.get_width(), 0.001 * self.screen.get_height())
+        )
+
         pygame.display.flip()
 
     def quit(self) -> None:

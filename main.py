@@ -11,4 +11,4 @@ GAME_DURATION_SEC = 2
 if __name__ == "__main__":
     game = Game(HEIGHT, WIDTH, FPS, GAME_DURATION_SEC)
     agent = Agent(game)
-    agent.play_agent(3)
+    agent.play_agent(1)
