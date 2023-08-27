@@ -7,5 +7,5 @@ class Agent:
 
     def play_game_many_times(self, n_replays: int) -> None:
         for _ in range(n_replays):
+            self.game.new_game()
             self.game.run()
-        self.game.quit()
