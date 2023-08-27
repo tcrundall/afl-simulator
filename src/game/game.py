@@ -38,7 +38,6 @@ class Game:
             width=self.screen.get_width() * 0.8,
             height=self.screen.get_height() * 0.8,
         )
-        self.place_players_and_ball()
 
     def place_players_and_ball(self) -> None:
         ball_start = Vector2(
@@ -55,9 +54,10 @@ class Game:
         self.player.shape.vel = Vector2(0, 0)
 
     def run(self) -> None:
+        self.place_players_and_ball()
+        dt = 0.0
         clock = pygame.time.Clock()
         running = True
-        dt = 0.0
         start = time.time()
 
         while running:
@@ -96,7 +96,6 @@ class Game:
                 running = False
 
         print("GAME OVER")
-        pygame.quit()
 
     def draw(self) -> None:
         self.screen.fill("green")
@@ -105,3 +104,6 @@ class Game:
         self.goals.draw()
         self.field.draw()
         pygame.display.flip()
+
+    def quit(self) -> None:
+        pygame.quit()
