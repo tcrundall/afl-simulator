@@ -3,3 +3,10 @@ __pycache__
 .venv
 .mypy_cache
 .git
+
+# results
+*.zip
+*checkpoints*
+
+# mypy
+mypy.ini

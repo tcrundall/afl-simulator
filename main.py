@@ -4,9 +4,9 @@ import sys
 from src.agent.agent import train, play, play_human
 
 
-HEIGHT = WIDTH = 900
+HEIGHT = WIDTH = 400
 FPS = 60
-GAME_DURATION_FRAMES = 3000
+GAME_DURATION_FRAMES = 1500
 
 
 if __name__ == "__main__":

@@ -15,7 +15,7 @@ from src.visuals.plot import plot
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1_000
 STATE_SIZE = 6
-HIDDEN1_SIZE = 6
+HIDDEN1_SIZE = 32 
 # HIDDEN2_SIZE = 32
 # HIDDEN3_SIZE = 32
 ACTION_SIZE = 4
@@ -217,7 +217,7 @@ def train(width: int, height: int, fps: int, game_duration_frames: int) -> None:
             game_over = True
 
         # train short memory
-        agent.train_short_memory(state_old, final_move, reward, state_new, game_over)
+        # agent.train_short_memory(state_old, final_move, reward, state_new, game_over)
 
         # remmeber
         agent.remember(state_old, final_move, reward, state_new, game_over)

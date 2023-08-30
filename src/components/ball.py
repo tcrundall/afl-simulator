@@ -30,7 +30,7 @@ class Ball:
             reward = 0
         else:
             self.shape.kick(agent.shape)
-            reward = 20
+            reward = 500
         return reward
 
     def is_colliding_with(self, edge: Edge, on_side: Vector2) -> bool:
