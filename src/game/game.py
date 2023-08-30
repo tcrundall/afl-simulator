@@ -3,6 +3,7 @@ import pygame
 from pygame import Vector2, font
 from typing import Tuple
 import numpy as np
+import random
 
 from src.enums.direction import Direction
 from src.components.player import Player
@@ -43,8 +44,8 @@ class Game:
         self.ball = Ball(self.screen, Vector2(-100, -200))
         self.goals = Goals(
             self.screen,
-            Vector2(self.screen.get_width() * 0.25, self.screen.get_height() * 0.5),
-            Vector2(self.screen.get_width() * 0.75, self.screen.get_height() * 0.5),
+            Vector2(self.screen.get_width() * 0.4, self.screen.get_height() * 0.15),
+            Vector2(self.screen.get_width() * 0.6, self.screen.get_height() * 0.15),
         )
         self.field = Field(
             self.screen,
@@ -54,11 +55,18 @@ class Game:
         )
 
     def place_players_and_ball(self) -> None:
+        ball_start_x = random.uniform(0.15, 0.85)
+        ball_start_y = random.uniform(0.15, 0.45)
         ball_start = Vector2(
-            self.screen.get_width() * 0.5, self.screen.get_height() * 0.4
+            self.screen.get_width() * ball_start_x,
+            self.screen.get_height() * ball_start_y,
         )
+
+        player_start_x = random.uniform(0.15, 0.85)
+        player_start_y = random.uniform(0.55, 0.85)
         player_start = Vector2(
-            self.screen.get_width() * 0.5, self.screen.get_height() * 0.2
+            self.screen.get_width() * player_start_x,
+            self.screen.get_height() * player_start_y,
         )
 
         self.ball.shape.pos = ball_start
@@ -100,7 +108,7 @@ class Game:
         self.ball.update(dt)
 
         # Pause here to meet target FPS
-        self.clock.tick(self.fps)
+        # self.clock.tick(self.fps)
 
         # Draw
         self.draw()
@@ -120,21 +128,6 @@ class Game:
         print(actions)
 
         return actions
-
-    # def run(self) -> None:
-    #     dt = 0.0
-    #     n_frames = 0
-    #     clock = pygame.time.Clock()
-    #     running = True
-    #
-    #     while running:
-    #         self.play_step(dt, actions=self.parse_keys())
-    #         dt = clock.tick(self.fps) / 1000
-    #         n_frames += 1
-    #         if n_frames >= self.game_duration_frames:
-    #             running = False
-    #
-    #     pygame.quit()
 
     def draw(self) -> None:
         self.screen.fill("green")

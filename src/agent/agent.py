@@ -14,10 +14,10 @@ from src.visuals.plot import plot
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1_000
-STATE_SIZE = 12
-HIDDEN1_SIZE = 32
-HIDDEN2_SIZE = 32
-HIDDEN3_SIZE = 32
+STATE_SIZE = 6
+HIDDEN1_SIZE = 6
+# HIDDEN2_SIZE = 32
+# HIDDEN3_SIZE = 32
 ACTION_SIZE = 4
 LR = 0.001
 
@@ -39,26 +39,42 @@ class Agent:
         self.model = Linear_QNet(
             input_size=STATE_SIZE,
             hidden1_size=HIDDEN1_SIZE,
-            hidden2_size=HIDDEN2_SIZE,
-            hidden3_size=HIDDEN3_SIZE,
+            # hidden2_size=HIDDEN2_SIZE,
+            # hidden3_size=HIDDEN3_SIZE,
             output_size=ACTION_SIZE,
         )
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game: Game) -> StateArr:
+        inv_width = 1.0 / game.screen.get_width()
+
+        rel_ball_x = game.ball.shape.pos.x - game.player.shape.pos.x
+        rel_ball_y = game.ball.shape.pos.y - game.player.shape.pos.y
+        rel_goals_left_x = game.goals.left_pos.x - game.player.shape.pos.x
+        rel_goals_left_y = game.goals.left_pos.y - game.player.shape.pos.y
+        rel_goals_right_x = game.goals.right_pos.x - game.player.shape.pos.x
+        rel_goals_right_y = game.goals.right_pos.y - game.player.shape.pos.y
+
+        ball_angle = np.arctan2(rel_ball_y, rel_ball_x)
+        ball_distance = np.sqrt(rel_ball_y**2 + rel_ball_x**2) * inv_width
+
+        goals_left_angle = np.arctan2(rel_goals_left_y, rel_goals_left_x)
+        goals_left_distance = (
+            np.sqrt(rel_goals_left_y**2 + rel_goals_left_x**2) * inv_width
+        )
+
+        goals_right_angle = np.arctan2(rel_goals_right_y, rel_goals_right_x)
+        goals_right_distance = (
+            np.sqrt(rel_goals_right_y**2 + rel_goals_right_x**2) * inv_width
+        )
+
         state = [
-            game.player.shape.pos.x,
-            game.player.shape.pos.y,
-            game.player.shape.vel.x,
-            game.player.shape.vel.y,
-            game.ball.shape.pos.x,
-            game.ball.shape.pos.y,
-            game.ball.shape.vel.x,
-            game.ball.shape.vel.y,
-            game.goals.left_pos.x,
-            game.goals.left_pos.y,
-            game.goals.right_pos.x,
-            game.goals.right_pos.y,
+            ball_angle,
+            ball_distance,
+            goals_left_angle,
+            goals_left_distance,
+            goals_right_angle,
+            goals_right_distance,
         ]
         return np.array(state)
 
@@ -166,6 +182,7 @@ def train(width: int, height: int, fps: int, game_duration_frames: int) -> None:
     if checkpoint_filename:
         plot_scores, plot_mean_scores = agent.load_checkpoint(checkpoint_filename)
         total_score = sum(plot_scores)
+        agent.n_games = len(plot_scores)
 
         skip_next_checkpoint_save = True
         print(f"Loaded state from from {checkpoint_filename}")
