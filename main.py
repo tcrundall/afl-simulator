@@ -1,13 +1,18 @@
 #! /usr/bin/env python
-from src.game.game import Game
-from src.agent.agent import Agent
+import sys
+
+from src.agent.agent import train, play, play_human
 
 
-HEIGHT = WIDTH = 500
+HEIGHT = WIDTH = 900
 FPS = 60
-GAME_DURATION_SEC = 2
+GAME_DURATION_FRAMES = 3000
 
 
 if __name__ == "__main__":
-    game = Game(HEIGHT, WIDTH, FPS, GAME_DURATION_SEC)
-    agent = Agent()
+    if sys.argv[1] == "train":
+        train(WIDTH, HEIGHT, FPS, GAME_DURATION_FRAMES)
+    elif sys.argv[1] == "human":
+        play_human(WIDTH, HEIGHT, FPS, 1_000_000_000)
+    else:
+        play(WIDTH, HEIGHT, FPS, GAME_DURATION_FRAMES)

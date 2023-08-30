@@ -27,11 +27,14 @@ class Field:
     def draw(self) -> None:
         pygame.draw.lines(self.screen, color="white", closed=True, points=self.corners)
 
-    def resolve_collisions(self, shapes: List[Snappable]) -> None:
+    def resolve_collisions(self, shapes: List[Snappable]) -> int:
+        reward = 0
         for shape in shapes:
-            self.snap_to_colliding_boundary(shape)
+            reward += self.snap_to_colliding_boundary(shape)
+        return reward
 
-    def snap_to_colliding_boundary(self, shape: Snappable) -> None:
+    def snap_to_colliding_boundary(self, shape: Snappable) -> int:
+        reward = 0
         center = Vector2(self.pos.x + self.width / 2, self.pos.y + self.height / 2)
         corners = [
             Vector2(self.pos.x, self.pos.y),
@@ -48,3 +51,5 @@ class Field:
         for edge in edges:
             if shape.is_colliding_with(edge, on_side=center):
                 shape.snap_to(edge=edge, on_side=center)
+                reward -= 5
+        return reward

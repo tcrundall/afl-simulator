@@ -1,7 +1,6 @@
 from __future__ import annotations
 import pygame
 from pygame import Vector2, font
-import time
 from typing import Tuple
 import numpy as np
 
@@ -19,12 +18,13 @@ from src.types.actionarr import ActionArr
 
 class Game:
     def __init__(
-        self, height: int, width: int, fps: int, game_duration_sec: int
+        self, height: int, width: int, fps: int, game_duration_frames: int
     ) -> None:
         self.fps = fps
-        self.game_duration_sec = game_duration_sec
+        self.game_duration_frames = game_duration_frames
         self.height = height
         self.width = width
+        self.clock = pygame.time.Clock()
 
     def reset_game(self) -> None:
         pygame.init()
@@ -79,7 +79,7 @@ class Game:
         if self.goals.check_goal(self.ball, dt):
             self.score += 1
             self.place_players_and_ball()
-            reward = 10
+            reward = 100
 
         # Handle player input
         actions_list = [
@@ -91,13 +91,16 @@ class Game:
         for ix in np.where(actions == 1)[0]:
             self.player.accelerate(actions_list[ix])
 
-        # Handle collisions
-        self.ball.handle_collision(self.player)
-        self.field.resolve_collisions([self.player, self.ball])
+        # Handle collisions (with negative rewards)
+        reward += self.ball.handle_collision(self.player)
+        reward += self.field.resolve_collisions([self.player, self.ball])
 
         # Update positions
         self.player.update(dt)
         self.ball.update(dt)
+
+        # Pause here to meet target FPS
+        self.clock.tick(self.fps)
 
         # Draw
         self.draw()
@@ -118,19 +121,20 @@ class Game:
 
         return actions
 
-    def run(self) -> None:
-        dt = 0.0
-        clock = pygame.time.Clock()
-        running = True
-        start = time.time()
-
-        while running:
-            self.play_step(dt, actions=self.parse_keys())
-            dt = clock.tick(self.fps) / 1000
-            if time.time() - start >= self.game_duration_sec:
-                running = False
-
-        pygame.quit()
+    # def run(self) -> None:
+    #     dt = 0.0
+    #     n_frames = 0
+    #     clock = pygame.time.Clock()
+    #     running = True
+    #
+    #     while running:
+    #         self.play_step(dt, actions=self.parse_keys())
+    #         dt = clock.tick(self.fps) / 1000
+    #         n_frames += 1
+    #         if n_frames >= self.game_duration_frames:
+    #             running = False
+    #
+    #     pygame.quit()
 
     def draw(self) -> None:
         self.screen.fill("green")

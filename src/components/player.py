@@ -10,7 +10,7 @@ Edge = Tuple[Vector2, Vector2]
 
 class Player:
     color = "blue"
-    radius = 10.0
+    radius = 40.0
 
     def __init__(self, screen: Surface, pos: Vector2) -> None:
         self.shape = Shape(screen, pos, self.radius, self.color)
